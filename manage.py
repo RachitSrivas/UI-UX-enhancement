@@ -1,6 +1,17 @@
 #!/usr/bin/env python
 import os
 import sys
+import email.message
+
+# A quick polyfill to replace the deleted 'cgi' module for older Django versions
+class MockCGI:
+    @staticmethod
+    def parse_header(line):
+        m = email.message.Message()
+        m['content-type'] = line
+        return m.get_content_type(), m.get_params() or {}
+
+sys.modules['cgi'] = MockCGI
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "workshop_portal.settings")
